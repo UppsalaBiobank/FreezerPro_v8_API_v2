@@ -24,13 +24,17 @@ module Sample_Type
             sample_type_desc = res_string['data']['attributes']['description']
             #puts 'sample type id: ' + sample_type_id + '. Sample type name: ' + $sample_type_name# + '. Sample type desc: ' + sample_type_desc
         when 400..404
-            error_msg = res_string['errors'][0]['detail']
-            error_code = res_string['errors'][0]['status']
-            puts "Code: #{error_code}: #{error_msg}" ## the #{} constructor can only be used in strings with double quotes
-        else  
-            puts "Unexpected error: #{res.code} - #{res.body}"
+            error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+            error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+            puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
+            return { success: false, error: error_msg, code: error_code }
+          else  
+            puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
+            return { success: false, error: res.body, code: res.code }
+          end
+      
+        rescue StandardError => e
+          puts "Request failed: #{e.message}"
+          return { success: false, error: e.message }
         end
-    end
-
 end
-
