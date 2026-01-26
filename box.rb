@@ -35,18 +35,19 @@ module Box
             puts "Successfully retreived box: #{$box_name} (ID: #{$box_id})"
             return {success: true, data: data }
         when 400..404
-            error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized' || 'Restricted access' || 'Sample not found'
-            error_code = res_data.dig('errors', 0, 'status') || res.code
-            puts "Code: #{error_code}: #{error_msg}"
+            error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+            error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+            puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
             return { success: false, error: error_msg, code: error_code }
-        else  
-            puts "Unexpected error: #{res.code} - #{res.body}"
+          else  
+            puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
             return { success: false, error: res.body, code: res.code }
+          end
+      
+        rescue StandardError => e
+          puts "Request failed: #{e.message}"
+          return { success: false, error: e.message }
         end
-    rescue StandardError => e
-        puts "Request failed: #{e.message}"
-        return { success: false, error: e.message }
-    end
 
     def create_box(name: nil, desc: nil, box_type_id: nil, box_container_id: nil)
         method = '/api/v2/boxes/'
@@ -85,13 +86,19 @@ module Box
             $box_type_id = res_data['data']['relationships']['box_type']['data']['id']
             $box_container_id = res_data['data']['relationships']['container']['id']
         when 400..404
-            error_msg = res_data['errors'][0]['detail']
-            error_code = res_data['errors'][0]['status']
-            puts 'Code: ' + error_code + ': ' + error_msg
-        else
-            puts "Unexpected error: #{res.code} - #{res.body}"
+            error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+            error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+            puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
+            return { success: false, error: error_msg, code: error_code }
+          else  
+            puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
+            return { success: false, error: res.body, code: res.code }
+          end
+      
+        rescue StandardError => e
+          puts "Request failed: #{e.message}"
+          return { success: false, error: e.message }
         end
-    end
 
     def update_box(uid, new_name, new_desc, new_barcode_tag)
         method = '/api/v2/boxes/'
@@ -116,13 +123,19 @@ module Box
             $box_type_id = res_data['data']['relationships']['box_type']['data']['id']
             $box_container_id = res_data['data']['relationships']['container']['id']
         when 400..404
-            error_msg = res_data['errors'][0]['detail']
-            error_code = res_data['errors'][0]['status']
-            puts 'Code: ' + error_code + ': ' + error_msg
-        else
-            puts "Unexpected error: #{res.code} - #{res.body}"
+            error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+            error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+            puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
+            return { success: false, error: error_msg, code: error_code }
+          else  
+            puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
+            return { success: false, error: res.body, code: res.code }
+          end
+      
+        rescue StandardError => e
+          puts "Request failed: #{e.message}"
+          return { success: false, error: e.message }
         end
-    end
 
     def list_boxes(filters: nil)
         method = 'api/v2/boxes'
@@ -151,26 +164,20 @@ module Box
             puts "Retrieved #{boxes.length} box(es)"
             return { success: true, data: boxes, count: boxes.length}
 
-        when 401
-            error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-            error_code = res_data.dig('errors', 0, 'status') || res.code
-            puts "Error #{error_code}: #{error_msg}"
+        when 400..404
+            error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+            error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+            puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
             return { success: false, error: error_msg, code: error_code }
-            
-          when 403
-            error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid rights - no permission to view sample locations'
-            error_code = res_data.dig('errors', 0, 'status') || res.code
-            puts "Error #{error_code}: #{error_msg}"
-            return { success: false, error: error_msg, code: error_code }
-        
-        else  
-            puts "Unexpected error: #{res.code} - #{res.body}"
+          else  
+            puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
             return { success: false, error: res.body, code: res.code }
+          end
+      
+        rescue StandardError => e
+          puts "Request failed: #{e.message}"
+          return { success: false, error: e.message }
         end
-    rescue StandardError => e
-        puts "Request failed: #{e.message}"
-        return { success: false, error: e.message }
-    end
 
     def get_box(box_id)
         list_boxes(filters: { 'box_id_eq' => box_id})
