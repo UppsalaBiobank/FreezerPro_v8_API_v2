@@ -40,19 +40,19 @@ module Sample
             return { success: true, data: data }
         
         when 400..404
-            error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized' || 'Restricted access' || 'Sample not found'
-            error_code = res_data.dig('errors', 0, 'status') || res.code
-            puts "Code: #{error_code}: #{error_msg}" ## the #{} constructor can only be used in strings with double quotes
+            error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+            error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+            puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
             return { success: false, error: error_msg, code: error_code }
-        else  
-            puts "Unexpected error: #{res.code} - #{res.body}"
+          else  
+            puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
             return { success: false, error: res.body, code: res.code }
+          end
+      
+        rescue StandardError => e
+          puts "Request failed: #{e.message}"
+          return { success: false, error: e.message }
         end
-    rescue StandardError => e
-        puts "Request failed: #{e.message}"
-        return { success: false, error: e.message }
-    end
-    #end
 
     # Update a specific sample
     # @param uid [String, Integer] Sample ID
@@ -118,18 +118,19 @@ module Sample
             return { success: true, data: data }
       
         when 400..404
-            error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized' || 'Restricted access' || 'Sample not found'
-            error_code = res_data.dig('errors', 0, 'status') || res.code
-            puts "Code: #{error_code}: #{error_msg}" ## the #{} constructor can only be used in strings with double quotes
-            return { success: false, error: error_msg, code: error_code}
-        else  
-            puts "Unexpected error: #{res.code} - #{res.body}"
+            error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+            error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+            puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
+            return { success: false, error: error_msg, code: error_code }
+          else  
+            puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
             return { success: false, error: res.body, code: res.code }
+          end
+      
+        rescue StandardError => e
+          puts "Request failed: #{e.message}"
+          return { success: false, error: e.message }
         end
-    rescue StandardError => e
-        puts 'Request failed: #{e.message}'
-        return { success: false, error: e.message }
-    end
     
 
     # Create a new sample
@@ -170,33 +171,20 @@ module Sample
             puts "Successfully created sample: #{sample_name} (ID: #{sample_id})"
             return { success: true, data: data, id: sample_id }
         
-        when 400
-            error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid parameters'
-            error_code = res_data.dig('errors', 0, 'status') || res.code
-            puts "Error #{error_code}: #{error_msg}"
+        when 400..404
+            error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+            error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+            puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
             return { success: false, error: error_msg, code: error_code }
-        
-        when 401
-            error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-            error_code = res_data.dig('errors', 0, 'status') || res.code
-            puts "Error #{error_code}: #{error_msg}"
-            return { success: false, error: error_msg, code: error_code }
-        
-        when 403
-            error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid rights'
-            error_code = res_data.dig('errors', 0, 'status') || res.code
-            puts "Error #{error_code}: #{error_msg}"
-            return { success: false, error: error_msg, code: error_code }
-        
-        else
-            puts "Unexpected error: #{res.code} - #{res.body}"
+          else  
+            puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
             return { success: false, error: res.body, code: res.code }
+          end
+      
+        rescue StandardError => e
+          puts "Request failed: #{e.message}"
+          return { success: false, error: e.message }
         end
-    
-    rescue StandardError => e
-        puts "Request failed: #{e.message}"
-        return { success: false, error: e.message }
-    end
   
 
     # Get all samples with optional filtering
@@ -229,21 +217,19 @@ module Sample
             puts "Retrieved #{samples.length} sample(s)"
             return { success: true, data: samples, count: samples.length }
         
-        when 401
-            error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-            error_code = res_data.dig('errors', 0, 'status') || res.code
-            puts "Error #{error_code}: #{error_msg}"
+        when 400..404
+            error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+            error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+            puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
             return { success: false, error: error_msg, code: error_code }
-        
-        else
-            puts "Unexpected error: #{res.code} - #{res.body}"
+          else  
+            puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
             return { success: false, error: res.body, code: res.code }
+          end
+      
+        rescue StandardError => e
+          puts "Request failed: #{e.message}"
+          return { success: false, error: e.message }
         end
-    
-    rescue StandardError => e
-    puts "Request failed: #{e.message}"
-    return { success: false, error: e.message }
-    end
-
 end  ##end of module
 
