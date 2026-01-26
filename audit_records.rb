@@ -35,26 +35,13 @@ module AuditRecord
       puts "Message: #{$audit_record_message}"
       return { success: true, data: data }
       
-    when 401
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
+    when 400..404
+      error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+      error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+      puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
       return { success: false, error: error_msg, code: error_code }
-      
-    when 403
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid rights - no permission to access this audit record'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    when 404
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Audit record not found'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    else
-      puts "Unexpected error: #{res.code} - #{res.body}"
+    else  
+      puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
       return { success: false, error: res.body, code: res.code }
     end
     
@@ -105,20 +92,13 @@ module AuditRecord
       puts "Retrieved #{records.length} audit record(s)"
       return { success: true, data: records, count: records.length }
       
-    when 401
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
+    when 400..404
+      error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+      error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+      puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
       return { success: false, error: error_msg, code: error_code }
-      
-    when 403
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Restricted access - no permission to view audit records'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    else
-      puts "Unexpected error: #{res.code} - #{res.body}"
+    else  
+      puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
       return { success: false, error: res.body, code: res.code }
     end
     
