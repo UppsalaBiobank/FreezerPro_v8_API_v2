@@ -45,29 +45,16 @@ module Vial
       puts "  Sample ID: #{$vial_sample_id}, Box ID: #{$vial_box_id}, Position: #{$vial_position}"
       return { success: true, data: data }
       
-    when 401
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
+    when 400..404
+      error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+      error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+      puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
       return { success: false, error: error_msg, code: error_code }
-      
-    when 403
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Restricted access - no permission to access this vial'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    when 404
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Vial not found'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    else
-      puts "Unexpected error: #{res.code} - #{res.body}"
+    else  
+      puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
       return { success: false, error: res.body, code: res.code }
     end
-    
+
   rescue StandardError => e
     puts "Request failed: #{e.message}"
     return { success: false, error: e.message }
@@ -138,33 +125,14 @@ module Vial
       
       puts "Successfully updated vial (ID: #{$vial_id})"
       return { success: true, data: data }
-      
-    when 400
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid parameters'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
+
+    when 400..404
+      error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+      error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+      puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
       return { success: false, error: error_msg, code: error_code }
-      
-    when 401
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    when 403
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid rights - no permission to update vials'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    when 404
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Vial not found'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    else
-      puts "Unexpected error: #{res.code} - #{res.body}"
+    else  
+      puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
       return { success: false, error: res.body, code: res.code }
     end
     
@@ -220,26 +188,13 @@ module Vial
       puts "Successfully created vial: #{vial_name || vial_barcode} (ID: #{vial_id})"
       return { success: true, data: data, id: vial_id }
       
-    when 400
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid parameters'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
+    when 400..404
+      error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+      error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+      puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
       return { success: false, error: error_msg, code: error_code }
-      
-    when 401
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    when 403
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid rights - no permission to create vials'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    else
-      puts "Unexpected error: #{res.code} - #{res.body}"
+    else  
+      puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
       return { success: false, error: res.body, code: res.code }
     end
     
@@ -269,29 +224,13 @@ module Vial
       puts "Successfully deleted vial (ID: #{uid})"
       return { success: true }
       
-    when 401
-      res_data = JSON.parse(res.body)
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
+    when 400..404
+      error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+      error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+      puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
       return { success: false, error: error_msg, code: error_code }
-      
-    when 403
-      res_data = JSON.parse(res.body)
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid rights - no permission to delete vials'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    when 404
-      res_data = JSON.parse(res.body)
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Vial not found'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    else
-      puts "Unexpected error: #{res.code} - #{res.body}"
+    else  
+      puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
       return { success: false, error: res.body, code: res.code }
     end
     
@@ -346,20 +285,13 @@ module Vial
       puts "Retrieved #{vials.length} vial(s)"
       return { success: true, data: vials, count: vials.length }
       
-    when 401
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Unauthorized'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
+    when 400..404
+      error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
+      error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
+      puts "Code: #{error_code}: #{error_msg}"                            # the "#{}"-constructor can only be used in strings with double quotes
       return { success: false, error: error_msg, code: error_code }
-      
-    when 403
-      error_msg = res_data.dig('errors', 0, 'detail') || 'Invalid rights - no permission to view sample locations'
-      error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Error #{error_code}: #{error_msg}"
-      return { success: false, error: error_msg, code: error_code }
-      
-    else
-      puts "Unexpected error: #{res.code} - #{res.body}"
+    else  
+      puts "Unexpected error: #{res.code} - #{res.body}" # response is outside of expected range
       return { success: false, error: res.body, code: res.code }
     end
     
@@ -387,9 +319,9 @@ module Vial
   # @param barcode [String] Barcode tag
   # @return [Hash] Response hash with :success, :data/:error
   def find_by_barcode(barcode)
-    list_vials(filters: { 'barcode_eq' => barcode })
+    list_vials(filters: { 'barcode_eq' => barcode.to_s })
   end
-
+  
   # Find vials out of freezer
   # @return [Hash] Response hash with :success, :data/:error
   def get_vials_out_of_freezer
