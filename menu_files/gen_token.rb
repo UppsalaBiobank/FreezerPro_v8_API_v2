@@ -21,6 +21,7 @@ module Gen_Token
         when 200
             $token = res_string['data']['attributes']['token']
             $token_expires = res_string['data']['attributes']['exp']
+            return { success: true, token: $token, expires: $token_expires }
         when 400..404
             error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
             error_code = res_data.dig('errors', 0, 'status') || res.code        # use HTTP status if not in response
