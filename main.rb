@@ -36,7 +36,13 @@ puts "Current server is #{$menu_print}"
 static_credentials
 
 ###generate token for use in api-calls
-Gen_Token.logon_for_token($user, $password)
+auth_result = Gen_Token.logon_for_token($user, $password)
+unless auth_result[:success]
+  puts "Login failed: #{auth_result[:error]}"
+  exit 1
+end
+
+puts "Login successful! Token expires at: #{$token_expires}"
 #Countdown.has_token_expired
 
 ## call method of your choosing e.g 
