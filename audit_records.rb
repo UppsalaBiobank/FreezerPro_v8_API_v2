@@ -25,8 +25,8 @@ module AuditRecord
     when 200
       data = res_data['data']
       # Store data in global variables
-      $audit_record_id = data['id']
-      $audit_record_message = data.dig('attributes', 'message')
+      $audit_record_id = data['id'] #first level no dig needed
+      $audit_record_message = data.dig('attributes', 'message') #dig for nested vaules
       $audit_record_comment = data.dig('attributes', 'comment')
       $audit_record_created_at = data.dig('attributes', 'created_at')
       $audit_record_user = data.dig('attributes', 'user')
@@ -88,9 +88,15 @@ module AuditRecord
     
     case res.code.to_i
     when 200
-      records = res_data['data']
-      puts "Retrieved #{records.length} audit record(s)"
-      return { success: true, data: records, count: records.length }
+      data = res_data['data']
+      # Store data in global variables
+      $audit_record_id = data['id'] #first level no dig needed
+      $audit_record_message = data.dig('attributes', 'message') #dig for nested vaules
+      $audit_record_comment = data.dig('attributes', 'comment')
+      $audit_record_created_at = data.dig('attributes', 'created_at')
+      $audit_record_user = data.dig('attributes', 'user')
+      puts "Retrieved #{data.length} audit record(s)"
+      return { success: true, data: data, count: data.length }
       
     when 400..404
       error_msg = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
