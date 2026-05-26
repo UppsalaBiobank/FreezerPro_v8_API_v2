@@ -1,6 +1,6 @@
 require 'uri'
 module Set_Server
-
+    extend self
     #def set_to_prod()        
     #    #webadress to FP prod
     #    #$current_server = URI.parse('https://freezerpro.regionuppsala.se')
@@ -25,5 +25,4 @@ module Set_Server
         end
         $menu_print = "|          #{$current_server.to_s}       |\n"
     end
-    extend self
 end
