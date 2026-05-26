@@ -82,4 +82,46 @@ module API
     puts "Request failed: #{e.message}"
     return { success: false, error: e.message }
   end
+
+  #Delete single post
+  #USed as boilerplate for all module specific Delete methods
+  # @param uid [String, Integer] ID of the records to delete
+  # @param endpoint [String] API enpoint name e.g 'freeezers', 'vials'
+  # @param verbose [Boolean] Whether to print status message
+  # @return [Hash] Response hash with :success, :data, :count, or :error
+  def delete(uid, endpoint:, verbose: true)
+    method = "/api/v2/#{endpoint}/"
+    url = URI.join($current_server, method, uid.to_s)
+    req = Net::HTTP::Delete.new(url)
+    req['Authorization'] = $token
+    req['Accept'] = '*/*'
+    
+    res = Net::HTTP.start(url.hostname, url.port, use_ssl: true) do |http|
+      http.request(req)
+    end
+
+
+    case res.code.to_i
+    when 204 #no content - successful deletion
+      return { success: true }
+      puts "Deleted #{endpoint}: #{uid}" if verbose
+    when 200 #if api returns a response here.
+      return { success: true}
+      puts "Deleted #{endpoint}: #{uid}" if verbose
+    when 400..404
+      res_data = res_body.empty? ? {} : JSON.parse(res_body)
+      error_msg  = res_data.dig('errors', 0, 'detail') || 'Unknown error'
+      error_code = res_data.dig('errors', 0, 'status') || res.code
+      puts "Code: #{error_code}: #{error_msg}" if verbose
+      return { success: false, error: error_msg, code: error_code }
+    else
+      puts "Unexpected error: #{res.code} - #{res.body}" if verbose
+      return { success: false, error: res.body, code: res.code }
+    end
+
+  rescue StandardError => e
+    puts "Request failed: #{e.message}"
+    return { success: false, error: e.message }
+  end
+  
 end
