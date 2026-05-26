@@ -10,73 +10,51 @@ require_relative './menu_files/select_file'
 require_relative './menu_files/gen_token'
 require_relative './menu_files/countdown'
 require_relative './menu_files/try'
-require_relative './audit_records'
-require_relative './sample'
-require_relative './sample_source'
-require_relative './sample_type'
-require_relative './vial'
-require_relative './box'
-require_relative './display_helpers'
-require_relative './batch_delete_vials'
-#require_relative './menu_files/main_menu'
-#puts 'br1 in main' ###used during testing###
-#include Set_Server
-include Credentials
-include Select_File
-include Try
-
-#main_ui
+require_relative './api_helper'
+require_relative './api_endpoints'
+require_relative './batch_delete_vial_parallel'
 
 ###set_server###
 Set_Server.select_server(2) ### 1 == prod, 2 == test
 puts "Current server is #{$menu_print}"
 
 ###set login method### -static credentials should only be used during dev.
-#variable_credentials
-static_credentials
+#Credentials.variable_credentials()
+Credentials.static_credentials()
 
 ###generate token for use in api-calls
+#Gen_Token.logon_for_token($user, $password)
 auth_result = Gen_Token.logon_for_token($user, $password)
 unless auth_result[:success]
-  puts "Login failed: #{auth_result[:error]}"
+  puts "Login failed:  #{auth_result[:error]}]"
   exit 1
 end
 
 puts "Login successful! Token expires at: #{$token_expires}"
-#Countdown.has_token_expired
 
-## call method of your choosing e.g 
-=begin
-# Display helpers
-result = Vial.find_by_barcode(1011857)
-DisplayHelpers.display_vials(result, title: 'Vials with barcode 1011857')
 
-# Example 2: Display sample sources
-result = SampleSource.list_sample_sources(filters: { 'name_cont' => 'patient' })
-DisplayHelpers.display_sample_sources(result, title: "PATIENT SAMPLE SOURCES")
+# Dry run
+puts "\n Running dry run to check what will be deleted"
+results = BatchVialOperationsParallel.dry_run_from_csv(input_csv: './csv/_test.csv', output_csv: './csv/dry_run_results.csv')
+if results[:success]
+  puts "\n Review dry_run_results.csv before proceeding."
+  printf "Continue with deletion? (y/n): "
+  confirmation = gets.chomp.downcase
+else
+  exit 1
+end
 
-# Example 3: Display audit records
-result = AuditRecord.get_recent_audit_records('01/01/2024')
-DisplayHelpers.display_audit_records(result, title: "RECENT AUDIT RECORDS")
-
-# Example 4: Simple list view
-result = Vial.get_vials_out_of_freezer()
-DisplayHelpers.display_list(result, fields: ['id', 'name', 'barcode_tag'])
-
-# Example 5: Export to CSV
-result = Sample.list_samples()
-DisplayHelpers.export_to_csv(
-  result, 
-  fields: ['name', 'description', 'created_at'],
-  filename: 'samples_export.csv'
-)
-
-# Example 6: Interactive selection
-result = Sample.list_samples(filters: { 'name_cont' => 'Bacteria' })
-selected_sample = DisplayHelpers.interactive_select(result)
-
-# Example 7: Display summary stats
-result = Vial.list_vials()
-DisplayHelpers.display_summary(result)
-
-=end
+if confirmation == 'y'
+  #Warning, actual deletion will be performed!
+  results = BatchVialOperations.batch_delete_from_csv(input_csv: './csv/_test.csv', output_csv: './csv/_results.csv')
+  if results[:success]
+    puts "\n Batch deletion completed"
+    puts "Check result csv for details."
+  else
+    exit 1
+  end
+end
+if confirmation == 'n'
+  puts "\n 'No' entered. Batch deletion cancelled."
+  exit 1
+end
