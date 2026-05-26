@@ -1,5 +1,6 @@
 module Credentials
-
+    extend self
+    
     def variable_credentials()
         print "Enter username: "
         $user = gets.chomp
@@ -24,5 +25,4 @@ module Credentials
     $user = 'xx'
     $password = 'yy'
     end
-    extend self
 end
