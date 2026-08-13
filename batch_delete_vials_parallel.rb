@@ -47,7 +47,7 @@ module BatchVialOperationsParallel
   # @param output_csv [String] Path to output results CSV file
   # @param barcode_column [String, Integer] Column name or index containing barcodes (default: 0)
   # @return [Hash] Summary of operation
-  def batch_delete_w_barcode(input_csv:, output_csv: 'deletion_results.csv', barcode_column: 0, threads: 50)
+  def batch_delete_w_barcode(input_csv:, output_csv: 'deletion_results.csv', barcode_column: 0, threads: 8) #threads: 10 can trigger rate limit during delete phase
     unless File.exist?(input_csv)
       puts "❌ Error: Input file '#{input_csv}' not found"
       return { success: false, error: "File not found" }
@@ -56,7 +56,7 @@ module BatchVialOperationsParallel
     # Read all rows to array so deletion can be parallelized
     rows = []
     CSV.foreach(input_csv, headers: true) do |row|
-      barcode = if barcode_column.is_a?(Integer) || barcode.is_a?(String)
+      barcode = if barcode_column.is_a?(Integer) || barcode_column.is_a?(String)
                   row[barcode_column]
                 else
                   row[0]
@@ -73,21 +73,20 @@ module BatchVialOperationsParallel
     puts "\nProcessing #{rows.length} vials...\n"
 
     mutex = Mutex.new
-    found_count = 0
-    not_found_count = 0
+    success_count = 0
+    fail_count = 0
 
     results = Parallel.map(rows, in_threads: threads) do |barcode|
-      sleep(rand(5.0..10.0)) #randomized delay to avoid synchronized bursts
+      sleep(rand(1.5..3.0)) #randomized delay to avoid synchronized bursts. 
       puts "Deleting barcode: #{barcode}... \n"
 
       result = process_single_vial(barcode)
             
       if result[:status].start_with?('Success')
         mutex.synchronize {success_count += 1}
-        puts "✅ #{result[:status]}"
       else
         mutex.synchronize {fail_count += 1}
-        puts "❌ #{result[:status]}"
+        puts "Fail #{result[:status]}"
       end
       result
     end
@@ -100,7 +99,7 @@ module BatchVialOperationsParallel
     puts "SUMMARY"
     puts "=" * 80
     puts "Total processed: #{results.length}"
-    puts "✅ Successful deletions: #{success_count}"
+    puts "✅ Successful operations: #{success_count}"
     puts "❌ Failed operations: #{fail_count}"
     puts "\nResults saved to: #{output_csv}"
     puts "=" * 80
@@ -132,7 +131,7 @@ module BatchVialOperationsParallel
     }
 
     # Step 1: Find vial by barcode
-    search_result = Vial.find_by_barcode(barcode, verbose: false)
+    search_result = Vial.find_vial_by_vial_barcode(barcode, verbose: false)
 
     unless search_result[:success]
       result_data[:status] = "F: API Error - #{search_result[:error]}"
@@ -150,12 +149,9 @@ module BatchVialOperationsParallel
     attrs = vial['attributes']
     
     result_data[:sample_id] = attrs['sample_id'].to_s
-    result_data[:box_id] = vial.dig('relationships', 'box', 'data', 'id').to_s
-    result_data[:position] = attrs['position'].to_s
-    result_data[:volume] = attrs['volume'].to_s
 
     # Step 3: Delete the vial
-    delete_result = Vial.delete_vial(vial_id)
+    delete_result = Vial.delete_vial(vial_id, verbose: true)
 
     if delete_result[:success]
       result_data[:status] = "Success"
@@ -208,8 +204,7 @@ module BatchVialOperationsParallel
     subdivision_cache = {}  #Cache: container_id => {name, bc, parent id}
      
     results = Parallel.map(rows, in_threads: threads) do |barcode|
-      #sleep(rand(0.1..0.5)) #randomized delay to avoid synchronized bursts
-      sleep(rand(5.0..10.0)) #randomized delay to avoid synchronized bursts
+      sleep(rand(0.1..0.5)) #randomized delay to avoid synchronized bursts
       puts "Checking barcode: #{barcode}... \n"
  
       result_data = {
@@ -237,8 +232,6 @@ module BatchVialOperationsParallel
        vial_attrs = vial['attributes']
        vial_relate = vial['relationships']
        result_data[:sample_id] = vial_attrs['sample_id'].to_s  ##this the same as relate/sample/data/id?
-       #result_data[:sample_id2] = vial_relate.dig('sample', 'data', 'id')
-       #puts "Sample_id: #{result_data[:sample_id]}\nSample_id2: #{result_data[:sample_id2]}\n"
        result_data[:box_id] = vial_relate.dig('box', 'data', 'id').to_s
        result_data[:position] = vial_attrs['position'].to_s
        result_data[:volume] = vial_attrs['volume'].to_s
@@ -254,7 +247,6 @@ module BatchVialOperationsParallel
         else
           box_result = Box.retreive_box(box_id, verbose: false)  # direct lookup by id instead of vial barcode
           if box_result[:success] && box_result[:count] > 0
-            #puts "box result is: ", box_result.class
             box = box_result[:data]
             box_attrs = box['attributes']
             box_relate = box['relationships']
@@ -272,10 +264,8 @@ module BatchVialOperationsParallel
        # Lookup sample type id using vial barcode (depends on sample_id)
       sample_type_id = nil #to avoid problems if sample_id lookup fails
       if !result_data[:sample_id].empty?
-        #sample_result = Sample.get_sample_by_vial_barcode(barcode, verbose: false) #filtered search
         sample_result = Sample.retreive_sample(result_data[:sample_id], verbose: false) #direct search
         if sample_result[:success] && sample_result[:count] > 0
-          ##puts "Sample result is: ", sample_result.class
           sample_type_id = sample_result[:data].dig('relationships', 'sample_type', 'data', 'id').to_s
           result_data[:sample_type_id] = sample_type_id
         end
@@ -291,7 +281,6 @@ module BatchVialOperationsParallel
           sample_type_result = Sample_Type.retreive_sample_type(sample_type_id, verbose: false) #direct search
           #sample_type_result = Sample_Type.get_sample_type_by_vial_barcode(barcode, verbose: true) #works but super slow
           if sample_type_result[:success] && sample_type_result[:count] > 0
-            ##puts "sample type result is: ", sample_type_result.class 
             sample_type_attrs = sample_type_result[:data].dig('attributes')  # not an array skip .first
             name = sample_type_attrs['name'].to_s
             result_data[:sample_type_name] = name
@@ -312,7 +301,6 @@ module BatchVialOperationsParallel
         else
           subdivision_result = Subdivision.retreive_subdivision(container_id, verbose: false)
           if subdivision_result[:success] && subdivision_result[:count] > 0
-            ##puts "Subdivision result is: ", subdivision_result.class
             subdivision = subdivision_result[:data]
             subdivision_attrs = subdivision['attributes']
             subdivision_relate = subdivision['relationships']
@@ -350,11 +338,9 @@ module BatchVialOperationsParallel
         
       result_data[:status] = "Found (would delete)"
       mutex.synchronize { found_count += 1 }
-      #puts "✅ Found"
       else
       result_data[:status] = "Not found"
       mutex.synchronize { not_found_count += 1 }
-      #puts "❌ Not found"
       end
  
       result_data
