@@ -17,7 +17,13 @@ module API
     res = Net::HTTP.start(url.hostname, url.port, use_ssl: true) do |http|
       http.request(req)
     end
- 
+
+    #check if response is actually JSON
+    if res.body.nil? || res.body.empty? || res.body.strip.start_with?('<')
+      puts "Server returned a non-JSON response (most likely rate limited): #{res.body[0..50]}"
+      return { success: false, error: "Rate limit or server error", code: res.code }
+    end
+
     res_data = JSON.parse(res.body)
     case res.code.to_i
     when 200
@@ -27,10 +33,10 @@ module API
     when 400..404
       error_msg  = res_data.dig('errors', 0, 'detail') || 'Unknown error'  # fallback if detail is missing
       error_code = res_data.dig('errors', 0, 'status') || res.code         # use HTTP status if not in response
-      puts "Code: #{error_code}: #{error_msg}"
+      puts "Code: #{error_code}: #{error_msg}" if verbose
       return { success: false, error: error_msg, code: error_code }
     else
-      puts "Unexpected error: #{res.code} - #{res.body}"                   # response is outside expected range
+      puts "Unexpected error: #{res.code} - #{res.body}" if verbose               # response is outside expected range
       return { success: false, error: res.body, code: res.code }
     end
  
@@ -42,7 +48,7 @@ module API
   # Generic filtered search function.
   # Used as boilerplate for all module-specific Get methods.
   # @param uid [String, Integer] ID of the record to retrieve
-  # @param endpoint [String] API endpoint name e.g. 'containers', 'freezers'
+  # @param endpoint [String] API endpoint name e.g. 'box', 'freezers'
   # @param verbose [Boolean] Whether to print status messages
   # @return [Hash] Response hash with :success, :data, :count, or :error
   def list(endpoint:, filters: nil, verbose: true)
@@ -60,6 +66,12 @@ module API
     req['Content-Type'] = 'application/json'
     res = Net::HTTP.start(url.hostname, url.port, use_ssl: true) do |http|
       http.request(req)
+    end
+
+    #check if response is actually JSON
+    if res.body.nil? || res.body.empty? || res.body.strip.start_with?('<')
+      puts "Server returned a non-JSON response (most likely rate limited): #{res.body[0..50]}"
+      return { success: false, error: "Rate limit or server error", code: res.code }
     end
 
     res_data = JSON.parse(res.body)
@@ -89,7 +101,11 @@ module API
   # @param endpoint [String] API enpoint name e.g 'freeezers', 'vials'
   # @param verbose [Boolean] Whether to print status message
   # @return [Hash] Response hash with :success, :data, :count, or :error
-  def delete(uid, endpoint:, verbose: true)
+  def delete(uid, endpoint:, verbose: true, retries: 3, retry_delay: 2)
+    attempts = 0
+    begin
+      attempts += 1
+    
     method = "/api/v2/#{endpoint}/"
     url = URI.join($current_server, method, uid.to_s)
     req = Net::HTTP::Delete.new(url)
@@ -99,29 +115,44 @@ module API
     res = Net::HTTP.start(url.hostname, url.port, use_ssl: true) do |http|
       http.request(req)
     end
-
-
+    
     case res.code.to_i
     when 204 #no content - successful deletion
+      puts "Endpoint: #{endpoint}, Deleted: #{uid}"
       return { success: true }
-      puts "Deleted #{endpoint}: #{uid}" if verbose
     when 200 #if api returns a response here.
+      puts "Endpoint: #{endpoint}, Deleted: #{uid}" if verbose
       return { success: true}
-      puts "Deleted #{endpoint}: #{uid}" if verbose
+    end
+
+    #check if response is actually JSON
+    if res.body.nil? || res.body.empty? || res.body.strip.start_with?('<')
+      puts "Server returned a non-JSON response (most likely rate limited): #{res.body[0..50]}" if verbose
+      return { success: false, error: "Rate limit or server error", code: res.code }
+    end
+    
+    res_data = JSON.parse(res.body)
+    case res.code.to_i
     when 400..404
-      res_data = res_body.empty? ? {} : JSON.parse(res_body)
       error_msg  = res_data.dig('errors', 0, 'detail') || 'Unknown error'
       error_code = res_data.dig('errors', 0, 'status') || res.code
-      puts "Code: #{error_code}: #{error_msg}" if verbose
-      return { success: false, error: error_msg, code: error_code }
+      #retry on deadlock
+      raise "deadlocked" if error_msg.include?('deadlocked') #trigger rescue for retry
+        puts "Code: #{error_code}: #{error_msg}" if verbose
+        return { success: false, error: error_msg, code: error_code }
     else
       puts "Unexpected error: #{res.code} - #{res.body}" if verbose
       return { success: false, error: res.body, code: res.code }
     end
+  end
 
   rescue StandardError => e
+    if e.message.include?('deadlocked') && attempts < retries
+      puts "Deadlock detected, retry attempt: #{attempts}/#{retries}..." if verbose
+      sleep(retry_delay)
+      retry
+    end
     puts "Request failed: #{e.message}"
     return { success: false, error: e.message }
   end
-  
 end
