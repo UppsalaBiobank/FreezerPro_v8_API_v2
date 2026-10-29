@@ -1,3 +1,5 @@
+## This module will search and delete vials in batches i.e in parallell when possible.
+
 # Skapa en CSV fil e.g UBB-xxxx.csv
 # barcode
 # 123456
@@ -49,7 +51,7 @@ module BatchVialOperationsParallel
   # @return [Hash] Summary of operation
   def batch_delete_w_barcode(input_csv:, output_csv: 'deletion_results.csv', barcode_column: 0, threads: 8) #threads: 10 can trigger rate limit during delete phase
     unless File.exist?(input_csv)
-      puts "❌ Error: Input file '#{input_csv}' not found"
+      puts "Error: Input file '#{input_csv}' not found"
       return { success: false, error: "File not found" }
     end
 
@@ -99,8 +101,8 @@ module BatchVialOperationsParallel
     puts "SUMMARY"
     puts "=" * 80
     puts "Total processed: #{results.length}"
-    puts "✅ Successful operations: #{success_count}"
-    puts "❌ Failed operations: #{fail_count}"
+    puts "Successful operations: #{success_count}"
+    puts "Failed operations: #{fail_count}"
     puts "\nResults saved to: #{output_csv}"
     puts "=" * 80
 
@@ -112,7 +114,7 @@ module BatchVialOperationsParallel
       results: results
     }
   rescue StandardError => e
-    puts "\n❌ Error during batch processing: #{e.message}"
+    puts "\n Error during batch processing: #{e.message}"
     puts e.backtrace.first(5)
     { success: false, error: e.message }
   end
@@ -127,6 +129,7 @@ module BatchVialOperationsParallel
       box_id: '',
       position: '',
       volume: '',
+      name: '',
       status: ''
     }
 
@@ -149,6 +152,7 @@ module BatchVialOperationsParallel
     attrs = vial['attributes']
     
     result_data[:sample_id] = attrs['sample_id'].to_s
+    result_data[:name] = attrs['name'].to_s
 
     # Step 3: Delete the vial
     delete_result = Vial.delete_vial(vial_id, verbose: true)
@@ -172,7 +176,7 @@ module BatchVialOperationsParallel
   # @return [Hash] Summary of operation
   def dry_run_w_barcode(input_csv:, output_csv: 'dry_run_results.csv', barcode_column: 0, threads: 10)
     unless File.exist?(input_csv)
-      puts "❌ Error: Input file '#{input_csv}' not found"
+      puts "Error: Input file '#{input_csv}' not found"
       return { success: false, error: "File not found" }
     end
  
@@ -353,10 +357,10 @@ module BatchVialOperationsParallel
     puts "DRY RUN SUMMARY"
     puts "=" * 80
     puts "Total checked: #{results.length}"
-    puts "✅ Found: #{found_count}"
-    puts "❌ Not found: #{not_found_count}"
+    puts "Found: #{found_count}"
+    puts "Not found: #{not_found_count}"
     puts "\nResults saved to: #{output_csv}"
-    puts "⚠️  NOTE: This was a dry run. No vials were deleted."
+    puts "NOTE: This was a dry run. No vials were deleted."
     puts "=" * 80
  
     {
