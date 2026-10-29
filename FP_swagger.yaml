@@ -1,0 +1,4746 @@
+---
+openapi: 3.0.1
+info:
+  title: FreezerPro API V2
+  version: v2
+components:
+  securitySchemes:
+    api_key:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    auth_out:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: authentication
+            attributes:
+              type: object
+              properties:
+                token:
+                  type: string
+                  default: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE2NzUwOTA1OTJ9.QbyNhqjQFw2CKppn2JQ4k3SAQ9kBfep77GALLukQwxA
+                exp:
+                  type: string
+                  default: '2023-01-30T14:56:32.307Z'
+                username:
+                  type: string
+                  default: username
+    auth_in:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+      - username
+      - password
+    udf_definition:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+    udf_definitions:
+      type: array
+      items:
+        "$ref": "#/components/schemas/udf_definition"
+    audit_record:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: audit_record
+            attributes:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: 'Box ''Box 1 (9000000298)'' moved: Old Location: ''Freezer
+                    3->Level 1->Box 1''. New Location: ''Freezer 2->Box 1'''
+                comment:
+                  type: string
+                  example: Box moved to make space
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                user:
+                  type: string
+                  nullable: true
+                  example: Alice Andrews
+    audit_records:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/audit_record"
+    box:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: box
+            attributes:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: 8 x 8
+                name:
+                  type: string
+                  example: Box 1
+                description:
+                  type: string
+                  example: A box for reagents
+                barcode_tag:
+                  type: string
+                  example: '9000021'
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                box_type:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: box_type
+                container:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: container
+                vials:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: vial
+                udfs:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: udf
+    boxes:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/box/properties/data"
+    box_type:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: box_type
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                width:
+                  type: integer
+                height:
+                  type: integer
+                x_col_display:
+                  type: string
+                y_col_display:
+                  type: string
+                import_format:
+                  type: string
+    clinical_test:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: clinical_test
+            attributes:
+              type: object
+              properties:
+                clinical_test_type_id:
+                  type: integer
+                  example: '1'
+                sample_source_id:
+                  type: integer
+                  example: '1'
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                clinical_test_type:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: clinical_test_type
+                sample_source:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: sample_source
+                udfs:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: udf
+    clinical_tests:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/clinical_test/properties/data"
+    clinical_test_type:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: clinical_test_type
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Blood Test
+                description:
+                  type: string
+                  example: A blood test
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+    clinical_test_types:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/clinical_test_type/properties/data"
+    container:
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: container
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Level 3
+                description:
+                  type: string
+                  example: The 3rd level in Freezer 5
+                barcode_tag:
+                  type: string
+                  example: '90003343'
+                rfid_tag:
+                  type: string
+                  example: RT4321123
+            relationships:
+              type: object
+              properties:
+                container:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: container
+                parent:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: parent
+    containers:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/container/properties/data"
+    customer:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: customer
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Customer 1
+                description:
+                  type: string
+                  example: A Customer
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                shipments:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: shipment
+                udfs:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: udf
+    freezer:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: freezer
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Freezer 1
+                description:
+                  type: string
+                  example: A freezer containing reagents
+                barcode_tag:
+                  type: string
+                  example: '900021312'
+                rfid_tag:
+                  type: string
+                  example: RT452345234
+            relationships:
+              type: object
+              properties:
+                udfs:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: udf
+                sensor_readings:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: sensor_reading
+    freezers:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/freezer/properties/data"
+    pick_list:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: pick_list
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Pick List 1
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                vials:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: vial
+                users:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: user
+                user_groups:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: user_group
+    pick_lists:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/pick_list/properties/data"
+    sample_state:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: sample_state
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Sample State 1
+                description:
+                  type: string
+                  example: Sample State Description Here
+                color:
+                  type: string
+                  example: "#000000"
+                lock_vials:
+                  type: boolean
+                  example: false
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                vial:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: vial
+    sample_states:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/sample_state/properties/data"
+    sample:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: sample
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Bacteria 1
+                description:
+                  type: string
+                  example: Sample Description Here
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                sample_type:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: sample_type
+                sample_source:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: sample_source
+                parent:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: parent
+                owner:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: owner
+                vials:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: vial
+                udfs:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: udf
+                sample_groups:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: sample_group
+    samples:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/sample/properties/data"
+    sample_group:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: sample_group
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Experiment 32 Sample Group
+    sample_type:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: sample_type
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Bacteria
+                description:
+                  type: string
+                  example: Bacteria sample type
+                volume_units:
+                  type: string
+                  example: mL
+                  nullable: true
+                icon:
+                  type: string
+                  example: i83
+                enabled:
+                  type: boolean
+                  example: false
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                is_preprint:
+                  type: boolean
+                  example: false
+    sample_types:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/sample_type/properties/data"
+    sample_source:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: sample_source
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Lab patient 20221111
+                description:
+                  type: string
+                  example: a description
+                enabled:
+                  type: boolean
+                  example: true
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                sample_source_type:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: sample_source_type
+                samples:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: sample
+                udfs:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: udf
+    sample_sources:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/sample_source/properties/data"
+    shipment:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: shipment
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Shipment to lab 6
+                shipped_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                customer:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: customer
+                shipped_by:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: shipped_by
+                ship_items:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: ship_item
+                udfs:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: udf
+    shipments:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/shipment/properties/data"
+    subdivision:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: subdivision
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Level 3
+                description:
+                  type: string
+                  example: The 3rd level
+                barcode_tag:
+                  type: string
+                  example: '900000232'
+                rfid_tag:
+                  type: string
+                  example: RT134511
+            relationships:
+              type: object
+              properties:
+                sensor_readings:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: sensor_reading
+                udfs:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: udf
+    subdivisions:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/subdivision/properties/data"
+    udf:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: udf
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Link to Website
+                value:
+                  type: string
+                  example: freezerpro.com
+    udfs:
+      type: array
+      items:
+        "$ref": "#/components/schemas/udf/properties/data"
+    user:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: user
+            attributes:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                  example: Kim Lu
+                email:
+                  type: string
+                  example: klu@mycompany.com
+                disabled:
+                  type: boolean
+                  nullable: true
+                  example: false
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                role:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: role
+                samples:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: sample
+                user_groups:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: user_group
+    user_group:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: user_group
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: UserGroup1
+    vial:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: vial
+            attributes:
+              type: object
+              properties:
+                custom_id:
+                  type: string
+                  nullable: true
+                  example: '12345678'
+                barcode_tag:
+                  type: string
+                  example: '1000001'
+                rfid_tag:
+                  type: string
+                  example: 355AB1CBC000001000000001
+                position:
+                  type: integer
+                  example: 1
+                freeze_thaw:
+                  type: integer
+                  nullable: true
+                  example: 3
+                out_by_user_id:
+                  type: integer
+                  nullable: true
+                  example: '1'
+                out_at:
+                  type: string
+                  nullable: true
+                  example: '2020-01-01T00:00:00.000Z'
+                sample_id:
+                  type: integer
+                  example: '1'
+                volume:
+                  type: number
+                  example: 3.0
+                name:
+                  type: string
+                  example: Bacteria 1
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                sample:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: sample
+                box:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: box
+                sample_state:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          default: sample_state
+    vials:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            "$ref": "#/components/schemas/vial/properties/data"
+    owner:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: user
+            attributes:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                  example: John Doe
+    role:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: role
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Guest
+                created_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+                updated_at:
+                  type: string
+                  example: '2020-01-01T00:00:00.000Z'
+            relationships:
+              type: object
+              properties:
+                users:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '1'
+                          type:
+                            type: string
+                            default: user
+    sample_source_type:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: sample_source_type
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Patient
+                description:
+                  type: string
+                  example: a patient at our clinic
+    sensor_reading:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: sensor_reading
+            attributes:
+              type: object
+              properties:
+                value:
+                  type: number
+                  example: -180.0
+    parent:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '1'
+        type:
+          type: string
+          example: sample
+        attributes:
+          "$ref": "#/components/schemas/sample"
+    shipped_by:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        attributes:
+          type: object
+          properties:
+            fullname:
+              type: string
+              example: Priya Lennox
+          nullable: true
+    ship_items:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        attributes:
+          type: object
+          properties:
+            shipment_id:
+              type: string
+              example: 1
+            sample_id:
+              type: integer
+              example: 23
+            barcode_tag:
+              type: string
+              example: '9000002'
+            rfid_tag:
+              type: string
+              example: RT900009
+    callback_url:
+      type: object
+      properties:
+        callback_url:
+          type: string
+          example: http://localhost:3001/notifications
+    invalid_model:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '422'
+              title:
+                type: string
+                example: Invalid Model
+              detail:
+                type: string
+                example: The model SampleSourceDummy does not exist in the database
+    invalid_udf:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '422'
+              title:
+                type: string
+                example: Invalid UDF
+              detail:
+                type: string
+                example: The User Defined-Field Vial Label does not exist
+    not_allowed_standard_field:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '422'
+              title:
+                type: string
+                example: Invalid Standard Field
+              detail:
+                type: string
+                example: The field name does not exist
+    invalid_date:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Invalid date
+              detail:
+                type: string
+                example: Please ensure that the date is matching your region
+    freezer_not_empty:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Freezer not empty
+              detail:
+                type: string
+                example: There are 10 vials in this freezer. Please remove them before
+                  deleting the freezer.
+    pick_list_not_active:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Pick List is not active
+              detail:
+                type: string
+                example: Pick List option is not selected in General Preferences
+    sample_state_name_already_exist:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Sample State Name already exists
+              detail:
+                type: string
+                example: 'Sample State with this name already exists: Sample State
+                  Two'
+    sample_state_in_use:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Sample State in use
+              detail:
+                type: string
+                example: Sample State is in use
+    sample_source_not_empty:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Sample Source not empty
+              detail:
+                type: string
+                example: Could not delete Sample Source. Object is in use.
+    subdivision_not_empty:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Subdivision not empty
+              detail:
+                type: string
+                example: There are 10 vials in this subdivision. Please remove them
+                  before deleting the subdivision.
+    user_in_use:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: User in use
+              detail:
+                type: string
+                example: Could not delete User. Object is in use.
+    shipment_is_shipped:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Shipment is shipped
+              detail:
+                type: string
+                example: Could not Update/Delete Shipment. Shipment is shipped
+    invalid_operator:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Invalid filter operator
+              detail:
+                type: string
+                example: 'The following operators are allowed: eq, neq'
+    authorization_error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                default: '401'
+              title:
+                type: string
+                default: Authorization error
+              detail:
+                type: string
+                default: User is not authorized to perform this action
+    unauthorized:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                default: '401'
+              title:
+                type: string
+                default: Unauthorized
+              detail:
+                type: string
+                default: Authentication failed
+    restricted_access:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '403'
+              title:
+                type: string
+                example: Restricted access
+              detail:
+                type: string
+                example: Access to Sample with id 1 is restricted
+    invalid_pat_syntax:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                default: '401'
+              title:
+                type: string
+                default: Invalid token syntax
+              detail:
+                type: string
+                default: Please use the correct syntax
+    pat_expired:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                default: '401'
+              title:
+                type: string
+                default: Unauthorized
+              detail:
+                type: string
+                default: Personal Access Token has expired for the current user and
+                  it will be deleted
+    pat_not_found:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                default: '404'
+              title:
+                type: string
+                default: Not Found
+              detail:
+                type: string
+                default: Personal Access Token not set for the current user
+    record_not_found:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '404'
+              title:
+                type: string
+                example: Record not found
+              detail:
+                type: string
+                example: Sample with id 1234 could not be found
+    invalid_rights:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '403'
+              title:
+                type: string
+                example: Invalid rights
+              detail:
+                type: string
+                example: User does not have the proper rights
+    invalid_params:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                example: '400'
+              title:
+                type: string
+                example: Invalid params
+              detail:
+                type: string
+                example: 'param is missing or the value is empty: name'
+    error:
+      type: object
+      properties:
+        error:
+          type: string
+    msg:
+      type: object
+      properties:
+        msg:
+          type: string
+    aliquot_template:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              default: '1'
+            type:
+              type: string
+              default: aliquot_template
+            attributes:
+              type: object
+              properties:
+                name:
+                  type: string
+                template:
+                  type: string
+                substruct_volume:
+                  type: boolean
+                uniqu_samples:
+                  type: boolean
+                copy_udfs:
+                  type: boolean
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+paths:
+  "/api/v2/auth/login":
+    post:
+      summary: Authenticate
+      tags:
+      - Login
+      parameters: []
+      responses:
+        '200':
+          description: authorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/auth_out"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/auth_in"
+  "/api/v2/audit_records":
+    get:
+      summary: Get Audit Records
+      tags:
+      - Audit Records
+      security:
+      - api_key: []
+      description: "Filtering supported using the following operators: <b>eq, neq,
+        cont, gt, lt</b>\n      </br></br>\n      <b>Searchable Attributes:</b> <ul><li><i>Standard
+        Fields</i>: comment, creation_date, obj_id, obj_type</li></ul>\n      </br></br>\n
+        \     Examples:\n      <ul>\n      <li>/api/v2/audit_records?filter[obj_type_eq]=User&filter[obj_id_eq]=41</li>\n
+        \     <li>/api/v2/audit_records?filter[creation_date_gt]=06/23/2022</li>\n
+        \     </ul>\n      "
+      responses:
+        '200':
+          description: no audit_records existing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/audit_record/properties/data"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+  "/api/v2/audit_records/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Audit Record id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get Audit Record
+      tags:
+      - Audit Records
+      security:
+      - api_key: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/audit_record"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/boxes":
+    get:
+      summary: Get Boxes
+      tags:
+      - Box
+      security:
+      - api_key: []
+      description: "Filtering supported using the following operators: <b>eq, neq,
+        cont, gt, lt</b>\n      </br></br>\n      <b>Searchable Attributes:</b> <ul><li><i>Standard
+        Fields</i>: available_cells, barcode, description, id, name, samples</li><li><i>Relation
+        box_type</i>: box_type_description, box_type_id, box_type_name</li><li><i>Relation
+        vial</i>: vial_barcode, vial_last_updated, vial_out_of_freezer, vial_rfid,
+        vial_taken_out_by, vial_taken_out_on, vial_volume, vial_workflow_state</li><li><i>Relation
+        owner</i>: owner_fullname, owner_id, owner_username</li><li><i>User Defined
+        Fields</i>: udf_UdfName</li></ul>\n      </br></br>\n      Examples:\n      <ul>\n
+        \     <li>/api/v2/boxes?filter[name_cont]=Adv</li>\n      <li>/api/v2/boxes?filter[barcode_eq]=9000000004</li>\n
+        \     <li>/api/v2/boxes?filter[available_cells_eq]=90</li>\n      <li>/api/v2/boxes?filter[udf_Link
+        to Website_eq]=freezerpro.com\n      </ul>\n      "
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/boxes"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+    post:
+      summary: Create Box
+      tags:
+      - Box
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/box"
+        '400':
+          description: not permitted params
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Box 200
+                description:
+                  type: string
+                  example: A box
+                box_type_id:
+                  type: integer
+                  example: 50
+                container_id:
+                  type: integer
+                  example: 201
+                udfs:
+                  type: array
+                  items:
+                    "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+              required:
+              - name
+              - box_type_id
+              - container_id
+  "/api/v2/boxes/{id}":
+    get:
+      summary: Retrieve Box
+      tags:
+      - Box
+      security:
+      - api_key: []
+      description: "Boxes can be returned including the following objects: \n      <ul>\n
+        \     <li>UDFs: /api/v2/boxes/{id}/?include=udfs</li>\n      <li>Box Type:
+        /api/v2/boxes/{id}/?include=box_type</li>\n      <li>Vials: /api/v2/boxes/{id}/?include=vials</li>\n
+        \     <li>Parents (containers): /api/v2/boxes/{id}/?include=parents</li>\n
+        \     <li>One parent at a time: /api/v2/boxes/{id}/?include=container.parent</li>\n
+        \     </ul>\n      "
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Box found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/box"
+        '404':
+          description: Box not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+    patch:
+      summary: Update Box
+      tags:
+      - Box
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/box"
+        '400':
+          description: not permitted params
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '404':
+          description: box not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '401':
+          description: unauthorized before editing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                box:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Updated box name
+                    description:
+                      type: string
+                      example: Updated description
+                    barcode_tag:
+                      type: string
+                      example: Updated barcode
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+    delete:
+      summary: Delete Box
+      tags:
+      - Box
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: successful
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/unauthorized"
+        '404':
+          description: Box not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/clinical_tests":
+    get:
+      summary: Get Clinical Tests
+      tags:
+      - Clinical Test
+      security:
+      - api_key: []
+      description: "Filtering supported using the following operators: <b>eq, neq,
+        cont, gt, lt</b>\n      </br></br>\n      <b>Searchable Attributes:</b> <ul><li><i>Standard
+        Fields</i>: created, created_by, id, last_updated, sample_source, test_type,
+        updated_by</li><li><i>User Defined Fields</i>: udf_UdfName</li></ul>\n      </br></br>\n
+        \     Examples:\n      <ul>\n      <li>/api/v2/clinical_tests?filter[sample_source_eq]=Sample
+        Source Test</li>\n      <li>/api/v2/clinical_tests?filter[test_type_eq]=Test
+        1</li>\n      <li>/api/v2/clinical_tests?filter[created_by_eq]=Administrator</li>\n
+        \     <li>/api/v2/clinical_tests?filter[udf_Cap Label_eq]=CapLabel2;filter[udf_Vial
+        Label_eq]=VialLabel1</li>\n      </ul>\n      "
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/clinical_tests"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+    post:
+      summary: Create Clinical Test
+      tags:
+      - Clinical Test
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/clinical_test"
+        '400':
+          description: udf not defined for test type
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          example: '400'
+                        title:
+                          type: string
+                          example: Invalid params
+                        detail:
+                          type: string
+                          example: "[UDF] is not a property of [Test Type]"
+        '401':
+          description: unauthorized before editing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clinical_data:
+                  type: object
+                  properties:
+                    clinical_test_type_id:
+                      type: integer
+                    sample_source_id:
+                      type: integer
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+                  required:
+                  - clinical_test_type_id
+                  - sample_source_id
+  "/api/v2/clinical_tests/{id}":
+    get:
+      summary: Retrieve Clinical Test
+      tags:
+      - Clinical Test
+      security:
+      - api_key: []
+      description: "Clinical Tests can be returned including the following objects:
+        \n      <ul>\n      <li>Clinical Test Type: /api/v2/clinical_tests/{id}?include=clinical_test_type</li>\n
+        \     <li>Sample Source: /api/v2/clinical_tests/{id}?include=sample_source</li>\n
+        \     <li>UDFs: /api/v2/clinical_tests/{id}?include=udfs</li>\n      </ul>\n
+        \     "
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Clinical Test found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/clinical_test"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+    patch:
+      summary: Update Clinical Test
+      tags:
+      - Clinical Test
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/clinical_test"
+        '400':
+          description: bad params
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '401':
+          description: unauthorized before editing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clinical_data:
+                  type: object
+                  properties:
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+    delete:
+      summary: Delete Clinical Test
+      tags:
+      - Clinical Test
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: successful
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/customers":
+    get:
+      summary: Get Customers
+      tags:
+      - Customer
+      security:
+      - api_key: []
+      responses:
+        '200':
+          description: no customers existing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/customer/properties/data"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+    post:
+      summary: Create Customer
+      tags:
+      - Customer
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/customer"
+        '400':
+          description: params missing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Customer 1
+                description:
+                  type: string
+                  example: A Customer
+                udfs:
+                  type: array
+                  items:
+                    "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+              required:
+              - name
+  "/api/v2/customers/{id}":
+    get:
+      summary: Retrieve Customer
+      tags:
+      - Customer
+      security:
+      - api_key: []
+      description: "Customers can be returned including the following objects: \n
+        \     <ul>\n      <li>Shipments: /api/v2/customers/{id}?include=shipments</li>\n
+        \     <li>UDFs: /api/v2/customers/{id}?include=udfs</li>\n      </ul>\n      "
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/customer"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+    patch:
+      summary: Update Customer
+      tags:
+      - Customer
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/customer"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '401':
+          description: unauthorized before editing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Customer 1 Updated
+                description:
+                  type: string
+                  example: A Customer Updated
+                udfs:
+                  type: array
+                  items:
+                    "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+    delete:
+      summary: Delete Customer
+      tags:
+      - Customer
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: successful
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '400':
+          description: cannot delete if assigned to a shipment
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/freezers":
+    get:
+      summary: Get Freezers
+      tags:
+      - Freezer
+      security:
+      - api_key: []
+      description: "Filtering supported using the following operators: <b>eq, neq,
+        cont, gt, lt</b>\n      </br></br>\n      <b>Searchable Attributes:</b> <ul><li><i>Standard
+        Fields</i>: barcode, description, name</li><li><i>User Defined Fields</i>:
+        udf_UdfName</li></ul>\n      </br></br>\n      Examples:\n      <ul>\n      <li>/api/v2/freezers?filter[barcode_eq]=7000000003</li>\n
+        \     <li>/api/v2/freezers?filter[udf_MyProperty_eq]=My Value</li>\n      </ul>\n
+        \     "
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/freezers"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+    post:
+      summary: Create Freezer
+      tags:
+      - Freezer
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/freezer"
+        '400':
+          description: not permitted params
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                freezer:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: New Freezer
+                    description:
+                      type: string
+                      example: New Freezer Description
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+                  required:
+                  - name
+                  - description
+  "/api/v2/freezers/{id}":
+    get:
+      summary: Retrieve Freezer
+      tags:
+      - Freezer
+      security:
+      - api_key: []
+      description: "Freezers can be returned including the following objects: \n      <ul>\n
+        \     <li>Sensor Readings: /api/v2/freezers/{id}/?include=sensor_readings</li>\n
+        \     <li>UDFs: /api/v2/freezers/{id}/?include=udfs</li>\n      <li>Containers:
+        /api/v2/freezers/{id}/?include=containers</li>\n      <li>Samples: /api/v2/freezers/{id}/?include=samples</li>\n
+        \     </ul>\n      "
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/freezer"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no permission to access
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+    patch:
+      summary: Update Freezer
+      tags:
+      - Freezer
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/freezer"
+        '400':
+          description: not permitted params
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: view-only access
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                freezer:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Updated freezer
+                    description:
+                      type: string
+                      example: Updated description
+                    barcode_tag:
+                      type: string
+                      example: Updated barcode
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+    delete:
+      summary: Delete Freezer
+      tags:
+      - Freezer
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: successful
+        '400':
+          description: not allowed if vials exist
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/freezer_not_empty"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: view only access
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/pick_lists":
+    get:
+      summary: Get Pick Lists
+      tags:
+      - Pick List
+      security:
+      - api_key: []
+      responses:
+        '200':
+          description: get all pick lists
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/pick_lists"
+        '400':
+          description: no work with pick lists setting
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/pick_list_not_active"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+    post:
+      summary: Create Pick List
+      tags:
+      - Pick List
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: created and shared
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/pick_list"
+        '400':
+          description: no work with pick lists setting
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/pick_list_not_active"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pick_list:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      default: Pick List Test
+                    users:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            default: '1'
+                    user_groups:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            default: Full_Permissions_User_Group
+  "/api/v2/pick_lists/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Pick List id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieve Pick List
+      tags:
+      - Pick List
+      security:
+      - api_key: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/pick_list"
+        '400':
+          description: no work with pick lists setting
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/pick_list_not_active"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+    patch:
+      summary: Update Pick List
+      tags:
+      - Pick List
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/pick_list"
+        '400':
+          description: invalid param
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pick_list:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      default: Pick List Test Updated
+                    users:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            default: '1'
+                    user_groups:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            default: Full_Permissions_User_Group
+    delete:
+      summary: Delete Pick List
+      tags:
+      - Pick List
+      security:
+      - api_key: []
+      responses:
+        '204':
+          description: successful
+        '400':
+          description: no work with pick lists setting
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/pick_list_not_active"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/sample_sources":
+    get:
+      summary: Get SampleSources
+      tags:
+      - Sample Source
+      security:
+      - api_key: []
+      description: "Filtering supported using the following operators: <b>eq, neq,
+        cont, gt, lt</b>\n      </br></br>\n      <b>Searchable Attributes:</b> <ul><li><i>Standard
+        Fields</i>: created, description, id, last_updated, name</li><li><i>Relation
+        sample</i>: sample_description, sample_expiration, sample_id, sample_last_updated,
+        sample_name, sample_vials_count, sample_volume, sample_udf_UdfName</li><li><i>Relation
+        clinical_test</i>: clinical_test_created, clinical_test_created_by, clinical_test_id,
+        clinical_test_last_updated, clinical_test_sample_source, clinical_test_test_type,
+        clinical_test_updated_by, clinical_test_udf_UdfName</li><li><i>Relation type</i>:
+        type_description, type_id, type_name</li><li><i>User Defined Fields</i>: udf_UdfName</li></ul>\n
+        \     </br></br>\n      Examples:\n      <ul>\n      <li>/api/v2/sample_sources?filter[name_eq]=Sample
+        Source Test</li>\n      <li>/api/v2/sample_sources?filter[description_cont]=Description</li>\n
+        \     <li>/api/v2/sample_sources?filter[created_eq]=10/07/2022</li>\n      <li>/api/v2/sample_sources?filter[udf_Address_cont]=Street</li>\n
+        \     </ul>\n      "
+      responses:
+        '200':
+          description: get all sample sources
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_sources"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+    post:
+      summary: Create SampleSource
+      tags:
+      - Sample Source
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_source"
+        '400':
+          description: params missing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sample_source:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      default: Test Sample Source
+                    description:
+                      type: string
+                      default: Test Sample Source Description
+                    sample_source_type_id:
+                      type: string
+                      default: 1
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+                  required:
+                  - name
+                  - sample_source_type_id
+  "/api/v2/sample_sources/{id}":
+    get:
+      summary: Retrieve SampleSource
+      tags:
+      - Sample Source
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_source"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+    patch:
+      summary: Update SampleSource
+      tags:
+      - Sample Source
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful with GLP
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_source"
+        '400':
+          description: invalid params
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: not accessible for user
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sample_source:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      default: Test Sample Source
+                    description:
+                      type: string
+                      default: Test Sample Source Description
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+    delete:
+      summary: Delete SampleSource
+      tags:
+      - Sample Source
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: successful
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: not accessible for user
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+        '400':
+          description: samples still exist
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_source_not_empty"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/sample_sources/sample_source_change":
+    post:
+      summary: Create SampleSource Subscription
+      tags:
+      - Sample Source
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            default: '1'
+                          type:
+                            type: string
+                            default: subscription
+                          attributes:
+                            type: object
+                            properties:
+                              object_type:
+                                type: string
+                                example: Sample Source
+                              callback_url:
+                                type: string
+                                example: http://localhost:3001/notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/callback_url"
+  "/api/v2/sample_states":
+    get:
+      summary: Get all sample states
+      tags:
+      - Sample States
+      security:
+      - api_key: {}
+      responses:
+        '200':
+          description: successful without access workflow module rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_types"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+    post:
+      summary: Creates a Sample State
+      tags:
+      - Sample States
+      security:
+      - api_key: {}
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_state"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '400':
+          description: sample state name already exists
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_state_name_already_exist"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/sample_state"
+  "/api/v2/sample_states/{id}":
+    patch:
+      summary: Updates a sample state type
+      tags:
+      - Sample States
+      security:
+      - api_key: {}
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_state"
+        '400':
+          description: sample state name already exists
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_state_name_already_exist"
+        '404':
+          description: sample state type not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '401':
+          description: unauthorized before editing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/sample_state"
+    get:
+      summary: Retrieves a sample state
+      tags:
+      - Sample States
+      security:
+      - api_key: {}
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful without access workflow module rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_state"
+        '404':
+          description: Sample state not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+    delete:
+      summary: Deletes a Sample state
+      tags:
+      - Sample States
+      security:
+      - api_key: {}
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: successful
+        '400':
+          description: not allowed if state in use
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample_state_in_use"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '404':
+          description: Sample state not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+  "/api/v2/samples":
+    get:
+      summary: Get Samples
+      tags:
+      - Sample
+      security:
+      - api_key: []
+      description: "Filtering supported using the following operators: <b>eq, neq,
+        cont, gt, lt</b>\n      </br></br>\n      <b>Searchable Attributes:</b> <ul><li><i>Standard
+        Fields</i>: description, expiration, id, last_updated, name, vials_count,
+        volume</li><li><i>Relation sample_type</i>: sample_type_description, sample_type_id,
+        sample_type_name</li><li><i>Relation vial</i>: vial_barcode, vial_last_updated,
+        vial_out_of_freezer, vial_rfid, vial_taken_out_by, vial_taken_out_on, vial_volume,
+        vial_workflow_state</li><li><i>Relation sample_group</i>: sample_group_description,
+        sample_group_id, sample_group_name</li><li><i>Relation owner</i>: owner_fullname,
+        owner_id, owner_username</li><li><i>Relation sample_source</i>: sample_source_created,
+        sample_source_description, sample_source_id, sample_source_last_updated, sample_source_name,
+        sample_source_udf_UdfName</li><li><i>User Defined Fields</i>: udf_UdfName</li></ul>\n
+        \     </br></br>\n      Examples:\n      <ul>\n      <li>/api/v2/samples?filter[name_cont]=Adv</li>\n
+        \     <li>/api/v2/samples?filter[volume_eq]=990</li>\n      <li>/api/v2/samples?filter[expiration_lt]=27/09/2022</li>\n
+        \     <li>/api/v2/samples?filter[vials_count_lt]=10</li>\n      <li>/api/v2/samples?filter[sample_type_name_eq]=Bacteria</li>\n
+        \     <li>/api/v2/sample_sources?filter[udf_Cap Label_cont]=Label 1;filter[vials_count_eq]=10</li>\n
+        \     </ul>\n      "
+      responses:
+        '200':
+          description: get all samples
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/samples"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+    post:
+      summary: Create Sample
+      tags:
+      - Sample
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample"
+        '400':
+          description: params missing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sample:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      default: Test Sample
+                    description:
+                      type: string
+                      default: Test Sample Description
+                    sample_type_id:
+                      type: integer
+                      default: 1
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+              required:
+              - name
+              - sample_type_id
+  "/api/v2/samples/{id}":
+    get:
+      summary: Retrieve Sample
+      tags:
+      - Sample
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: not accessible for user
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+    patch:
+      summary: Update Sample
+      tags:
+      - Sample
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: works with glp on
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/sample"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: not accessible for user
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sample:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      default: Test Sample
+                    description:
+                      type: string
+                      default: Test Sample Description
+                    comment:
+                      type: string
+                      default: Add only if GLP is enabled
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+  "/api/v2/samples/sample_change":
+    post:
+      summary: Create Sample Subscription
+      tags:
+      - Sample
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            default: '1'
+                          type:
+                            type: string
+                            default: subscription
+                          attributes:
+                            type: object
+                            properties:
+                              object_type:
+                                type: string
+                                example: Sample
+                              callback_url:
+                                type: string
+                                example: http://localhost:3001/notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/callback_url"
+  "/api/v2/shipments":
+    get:
+      summary: Get Shipments
+      tags:
+      - Shipment
+      security:
+      - api_key: []
+      description: "Filtering supported using the following operators: <b>eq, neq,
+        cont, gt, lt</b>\n      </br></br>\n      <b>Searchable Attributes:</b> <ul><li><i>Standard
+        Fields</i>: created, created_by, id, last_updated, name, ship_client_name,
+        ship_items, shipped_by_fullname, shipped_on, vials</li><li><i>Relation customer</i>:
+        customer_description, customer_name, customer_udf_UdfName</li><li><i>Relation
+        shipped_by</i>: shipped_by_fullname, shipped_by_id, shipped_by_username</li><li><i>User
+        Defined Fields</i>: udf_UdfName</li></ul>\n      </br></br>\n      Examples:\n
+        \     <ul>\n      <li>/api/v2/shipments?filter[name_eq]=Test Shipment 1</li>\n
+        \     <li>/api/v2/shipments?filter[customer_name_eq]=TestCustomer</li>\n      <li>/api/v2/shipments?filter[vials_eq]=3</li>\n
+        \     <li>/api/v2/shipments?filter[created_by_eq]=Administrator</li>\n      <li>/api/v2/shipments?filter[udf_Custom
+        Property_eq]=The Value</li>\n      </ul>\n      "
+      responses:
+        '200':
+          description: no shipments existing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/shipments"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+    post:
+      summary: Create Shipment
+      tags:
+      - Shipment
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/shipment"
+        '400':
+          description: no such udf
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/shipment"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                shipment:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Shipment 1
+                    customer_id:
+                      type: integer
+                      example: 1
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+                  required:
+                  - name
+                  - customer_id
+  "/api/v2/shipments/{id}":
+    patch:
+      summary: Update Shipment
+      tags:
+      - Shipment
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/shipment"
+        '400':
+          description: cannot update because shipment is completed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/shipment_is_shipped"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '401':
+          description: unauthorized before editing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                shipment:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Shipment 1 Updated
+                    customer_id:
+                      type: integer
+                      example: 1
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+    get:
+      summary: Retrieve Shipment
+      tags:
+      - Shipment
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/shipment"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+    delete:
+      summary: Delete Shipment
+      tags:
+      - Shipment
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: successful
+        '400':
+          description: cannot delete because shipment is completed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/shipment_is_shipped"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/subdivisions":
+    get:
+      summary: Get subdivisions
+      tags:
+      - Subdivision
+      security:
+      - api_key: []
+      description: "Filtering supported using the following operators: <b>eq, neq,
+        cont, gt, lt</b>\n      </br></br>\n      <b>Searchable Attributes:</b> <ul><li><i>Standard
+        Fields</i>: barcode, description, name</li><li><i>User Defined Fields</i>:
+        udf_UdfName</li></ul>\n      </br></br>\n      Examples:\n      <ul>\n      <li>/api/v2/subdivisions?filter[name_cont]=Level</li>\n
+        \     <li>/api/v2/subdivisions?filter[barcode_eq]=7000000005</li>\n      </ul>\n
+        \     "
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/subdivisions"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+    post:
+      summary: Creates a new subdivision
+      tags:
+      - Subdivision
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/subdivision"
+        '400':
+          description: missing params
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subdivision:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Level 2
+                    description:
+                      type: string
+                      example: description
+                    parent_id:
+                      type: integer
+                      example: 5
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+                  required:
+                  - name
+                  - parent_id
+  "/api/v2/subdivisions/{id}":
+    patch:
+      summary: Updates a subdivision
+      tags:
+      - Subdivision
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/subdivision"
+        '400':
+          description: invalid params
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: invalid rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subdivision:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Level 3
+                    description:
+                      type: string
+                      example: The description
+                    barcode_tag:
+                      type: string
+                      example: Updated barcode
+                    parent_id:
+                      type: integer
+                      example: 7
+                    udfs:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/udf/properties/data/properties/attributes"
+    get:
+      summary: Retrieves a subdivision
+      tags:
+      - Subdivision
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/subdivision"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no access
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+    delete:
+      summary: Deletes a subdivision
+      tags:
+      - Subdivision
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: successful
+        '400':
+          description: not empty
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/subdivision_not_empty"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/users":
+    get:
+      summary: Get Users
+      tags:
+      - User
+      security:
+      - api_key: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/user/properties/data"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+    post:
+      summary: Create User
+      tags:
+      - User
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/user"
+        '400':
+          description: params missing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      example: kimlu
+                    fullname:
+                      type: string
+                      example: Kim Lu
+                    email:
+                      type: string
+                      example: klu@mycompany.com
+                    password:
+                      type: string
+                      example: apassword
+                    role:
+                      type: string
+                      example: Guest
+                    user_groups:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/user_group/properties/data/properties/attributes"
+                  required:
+                  - username
+                  - password
+                  - fullname
+                  - email
+                  - role
+  "/api/v2/users/{id}":
+    get:
+      summary: Retrieve User
+      tags:
+      - User
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/user"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+    patch:
+      summary: Update User
+      tags:
+      - User
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/user"
+        '400':
+          description: params missing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '401':
+          description: unauthorized before editing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      example: TestUser1
+                    password:
+                      type: string
+                      example: TestUser1
+                    fullname:
+                      type: string
+                      example: Test User Name
+                    email:
+                      type: string
+                      example: testuser1@email.com
+                    role:
+                      type: string
+                      example: Administrator
+                    user_groups:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/user_group/properties/data/properties/attributes"
+    delete:
+      summary: Delete User
+      tags:
+      - User
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: User found
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '400':
+          description: cannot delete because user is in use
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/user_in_use"
+  "/api/v2/vials":
+    get:
+      summary: Get Vials
+      tags:
+      - Vial
+      security:
+      - api_key: []
+      description: "Filtering supported using the following operators: <b>eq, neq,
+        cont, gt, lt</b>\n      </br></br>\n      <b>Searchable Attributes:</b> <ul><li><i>Standard
+        Fields</i>: barcode, last_updated, out_of_freezer, rfid, taken_out_by, taken_out_on,
+        volume, workflow_state</li><li><i>Relation box</i>: box_available_cells, box_barcode,
+        box_description, box_id, box_name, box_samples, box_udf_UdfName</li><li><i>Relation
+        sample</i>: sample_description, sample_expiration, sample_id, sample_last_updated,
+        sample_name, sample_vials_count, sample_volume, sample_udf_UdfName</li><li><i>Relation
+        sample_group</i>: sample_group_description, sample_group_id, sample_group_name</li><li><i>Relation
+        sample_owner</i>: sample_owner_fullname, sample_owner_id, sample_owner_username</li><li><i>Relation
+        sample_type</i>: sample_type_description, sample_type_id, sample_type_name</li><li><i>Relation
+        sample_source</i>: sample_source_created, sample_source_description, sample_source_id,
+        sample_source_last_updated, sample_source_name, sample_source_udf_UdfName</li></ul>\n
+        \     </br></br>\n      Examples:\n      <ul>\n      <li>/api/v2/vials?filter[barcode_eq]=1000016</li>\n
+        \     <li>/api/v2/vials?filter[out_of_freezer_eq]=true</li>\n      <li>/api/v2/vials?filter[taken_out_by_eq]=admin</li>\n
+        \     <li>/api/v2/vials?filter[volume_lt]=99</li>\n      <li>/api/v2/vials?filter[workflow_state_eq]=State
+        1</li>\n      <li>/api/v2/vials?filter[sample_name_eq]=AdvSearchSample</li>\n
+        \     <li>/api/v2/vials?filter[sample_group_name_neq]=SampleGroup Test</li>\n
+        \     <li>/api/v2/vials?filter[box_name_eq]=Box 1;filter[sample_name_eq]=AdvSearchSample</li>\n
+        \     </ul>\n      "
+      responses:
+        '200':
+          description: get all vials
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/vials"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights to view all samples locations
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+    post:
+      summary: Create Vial
+      tags:
+      - Vial
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/vial"
+        '400':
+          description: params missing
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights to work with samples
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vial:
+                  type: object
+                  properties:
+                    sample_id:
+                      type: integer
+                      default: 1
+                    box_id:
+                      type: integer
+                      default: 1
+                    position:
+                      type: integer
+                      default: 25
+                    volume:
+                      type: number
+                      default: 3.0
+                  required:
+                  - sample_id
+                  - box_id
+                  - position
+  "/api/v2/vials/{id}":
+    get:
+      summary: Retrieve Vial
+      tags:
+      - Vial
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/vial"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no access due to permission
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/restricted_access"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+    patch:
+      summary: Update vial
+      tags:
+      - Vial
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful with GLP
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/vial"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights to work with samples
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '400':
+          description: not allowed to change sample type
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_params"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vial:
+                  type: object
+                  properties:
+                    box_id:
+                      type: integer
+                      default: 1
+                    position:
+                      type: integer
+                      default: 25
+                    volume:
+                      type: number
+                      default: 2.0
+                    barcode_tag:
+                      type: string
+                      default: '1000002'
+                    rfid_tag:
+                      type: string
+                      default: 355AB1CBC000001000000001
+                    vial_state:
+                      type: string
+                      default: Vial State
+    delete:
+      summary: Delete Vial
+      tags:
+      - Vial
+      security:
+      - api_key: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: successful
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/authorization_error"
+        '403':
+          description: no rights to delete samples
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/invalid_rights"
+        '404':
+          description: not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/record_not_found"
+  "/api/v2/vials/vial_change":
+    post:
+      summary: Create Vial Subscription
+      tags:
+      - Vial
+      security:
+      - api_key: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            default: '1'
+                          type:
+                            type: string
+                            default: subscription
+                          attributes:
+                            type: object
+                            properties:
+                              object_type:
+                                type: string
+                                example: Vial
+                              callback_url:
+                                type: string
+                                example: http://localhost:3001/notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/callback_url"
+        required: true
