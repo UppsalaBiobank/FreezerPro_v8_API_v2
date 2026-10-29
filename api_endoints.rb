@@ -213,4 +213,13 @@ module Vial
   def find_vial_by_sample_type_id(sample_type_id, verbose: true)
     list_vials(filters: {'sample_type_id_eq' => sample_type_id.to_s}, verbose: verbose)
   end
+
+  def update_vial_by_vial_id(vial_id, payload:, verbose: true)
+    API.patch(vial_id, payload: payload, endpoint: 'vials', verbose: verbose)
+  end
+
+  def delete_vial(vial_id, filters: nil, verbose: true)
+    API.delete(vial_id, endpoint: 'vials', verbose: verbose)
+  end
+
 end
