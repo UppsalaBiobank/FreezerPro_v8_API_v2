@@ -12,7 +12,9 @@ require_relative './menu_files/countdown'
 require_relative './menu_files/try'
 require_relative './api_helper'
 require_relative './api_endpoints'
-require_relative './batch_delete_vial_parallel'
+require_relative './batch_delete_vials'
+require_relative './batch_update_vials'
+include Try
 
 ###set_server###
 Set_Server.select_server(2) ### 1 == prod, 2 == test
@@ -32,7 +34,12 @@ end
 
 puts "Login successful! Token expires at: #{$token_expires}"
 
+input_file = './csv/filnamn_in.csv'
+output_file = './csv/filnamn_out.csv'
 
+
+
+#exempel
 # Dry run
 puts "\n Running dry run to check what will be deleted"
 results = BatchVialOperationsParallel.dry_run_from_csv(input_csv: './csv/_test.csv', output_csv: './csv/dry_run_results.csv')
